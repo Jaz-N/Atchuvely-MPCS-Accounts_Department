@@ -8,7 +8,7 @@
 // ─────────────────────────────────────────────
 //  CONFIGURATION — EDIT THIS
 // ─────────────────────────────────────────────
-const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxawqgBZRS8JeMqKAkoeRJr1IMdk2JgePEIew2AcM7AFQM84aUwaLC99dGbBQmIV_XfHA/exec";
 
 // Session key names
 const SESSION_USER_KEY = "mpcs_user";
