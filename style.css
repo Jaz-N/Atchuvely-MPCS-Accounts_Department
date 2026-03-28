@@ -171,10 +171,10 @@ body {
 }
 
 .login-title {
-  font-family: var(--font-display);
+   .login-brand .brand-text h1 {
+  color: var(--slate-900);
   font-size: 1.6rem;
   font-weight: 700;
-  color: white;
   margin-bottom: 4px;
 }
 
@@ -218,12 +218,10 @@ input[type="text"],
 input[type="password"],
 input[type="url"],
 textarea {
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: var(--radius-sm);
   border: 1.5px solid rgba(255,255,255,0.1);
-  background: rgba(255,255,255,0.06);
-  color: white;
+  background: white;
+  color: var(--slate-800);
+  border: 1.5px solid var(--slate-200);
   font-family: var(--font-body);
   font-size: 0.95rem;
   transition: border-color 0.2s, box-shadow 0.2s;
