@@ -1,0 +1,397 @@
+/**
+ * VALI EAST NORTHERN DIVISION MPCS LTD
+ * Project Dashboard — Frontend Logic
+ *
+ * Replace APPS_SCRIPT_URL with your deployed Google Apps Script Web App URL.
+ */
+
+// ─────────────────────────────────────────────
+//  CONFIGURATION — EDIT THIS
+// ─────────────────────────────────────────────
+const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+// Session key names
+const SESSION_USER_KEY = "mpcs_user";
+const SESSION_TOKEN_KEY = "mpcs_token";
+
+// ─────────────────────────────────────────────
+//  PAGE DETECTION
+// ─────────────────────────────────────────────
+const isLoginPage = document.body.classList.contains("login-page");
+const isDashboardPage = document.body.classList.contains("dashboard-page");
+
+// ─────────────────────────────────────────────
+//  SESSION HELPERS
+// ─────────────────────────────────────────────
+function setSession(username) {
+  const token = btoa(username + ":" + Date.now()); // simple client token
+  sessionStorage.setItem(SESSION_USER_KEY, username);
+  sessionStorage.setItem(SESSION_TOKEN_KEY, token);
+}
+
+function getSession() {
+  return {
+    username: sessionStorage.getItem(SESSION_USER_KEY),
+    token: sessionStorage.getItem(SESSION_TOKEN_KEY),
+  };
+}
+
+function clearSession() {
+  sessionStorage.removeItem(SESSION_USER_KEY);
+  sessionStorage.removeItem(SESSION_TOKEN_KEY);
+}
+
+function isLoggedIn() {
+  const { username, token } = getSession();
+  return !!(username && token);
+}
+
+// ─────────────────────────────────────────────
+//  ROUTE GUARDS
+// ─────────────────────────────────────────────
+if (isLoginPage && isLoggedIn()) {
+  window.location.href = "dashboard.html";
+}
+
+if (isDashboardPage && !isLoggedIn()) {
+  window.location.href = "index.html";
+}
+
+// ─────────────────────────────────────────────
+//  LOGIN PAGE LOGIC
+// ─────────────────────────────────────────────
+if (isLoginPage) {
+  // Allow Enter key to submit
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") handleLogin();
+  });
+}
+
+async function handleLogin() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
+  const errorBanner = document.getElementById("login-error");
+  const errorText = document.getElementById("login-error-text");
+  const btn = document.getElementById("login-btn");
+
+  hideElement(errorBanner);
+
+  if (!username || !password) {
+    errorText.textContent = "Please enter both username and password.";
+    showElement(errorBanner);
+    return;
+  }
+
+  setLoading(btn, true);
+
+  try {
+    const res = await apiCall({
+      action: "login",
+      username,
+      password,
+    });
+
+    if (res.success) {
+      setSession(username);
+      window.location.href = "dashboard.html";
+    } else {
+      errorText.textContent = res.message || "Invalid credentials. Please try again.";
+      showElement(errorBanner);
+    }
+  } catch (err) {
+    errorText.textContent = "Connection error. Check your Apps Script URL and try again.";
+    showElement(errorBanner);
+    console.error("Login error:", err);
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+function togglePassword() {
+  const field = document.getElementById("password");
+  field.type = field.type === "password" ? "text" : "password";
+}
+
+// ─────────────────────────────────────────────
+//  DASHBOARD PAGE LOGIC
+// ─────────────────────────────────────────────
+let allProjects = [];
+
+if (isDashboardPage) {
+  // Set user info in sidebar
+  const { username } = getSession();
+  const nameEl = document.getElementById("user-name-sidebar");
+  const avatarEl = document.getElementById("user-avatar");
+  if (nameEl) nameEl.textContent = username || "User";
+  if (avatarEl) avatarEl.textContent = (username || "U").charAt(0).toUpperCase();
+
+  // Load projects on start
+  loadProjects();
+}
+
+async function loadProjects() {
+  const grid = document.getElementById("projects-grid");
+  const loading = document.getElementById("projects-loading");
+  const empty = document.getElementById("projects-empty");
+  const totalEl = document.getElementById("total-projects");
+  const activeEl = document.getElementById("active-projects");
+
+  showElement(loading);
+  hideElement(grid);
+  hideElement(empty);
+
+  try {
+    const res = await apiCall({ action: "getProjects" });
+
+    if (res.success) {
+      allProjects = res.projects || [];
+
+      if (totalEl) totalEl.textContent = allProjects.length;
+      if (activeEl) activeEl.textContent = allProjects.length;
+
+      if (allProjects.length === 0) {
+        showElement(empty);
+      } else {
+        renderProjects(allProjects);
+        showElement(grid);
+      }
+    } else {
+      showError("Failed to load projects: " + (res.message || "Unknown error"));
+    }
+  } catch (err) {
+    console.error("Load projects error:", err);
+    showError("Could not connect to the backend. Verify your Apps Script URL.");
+  } finally {
+    hideElement(loading);
+  }
+}
+
+function renderProjects(projects) {
+  const grid = document.getElementById("projects-grid");
+  grid.innerHTML = "";
+
+  projects.forEach((p, i) => {
+    const card = document.createElement("div");
+    card.className = "project-card";
+    card.innerHTML = `
+      <div class="project-card-top"></div>
+      <div class="project-card-body">
+        <span class="project-index">Project #${String(i + 1).padStart(2, "0")}</span>
+        <h3 class="project-name">${escapeHtml(p.name)}</h3>
+        <p class="project-desc">${escapeHtml(p.description) || "No description provided."}</p>
+      </div>
+      <div class="project-card-footer">
+        <a href="${escapeHtml(p.link)}" target="_blank" rel="noopener noreferrer" class="btn-open">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
+          Open
+        </a>
+        <span class="project-link-chip" title="${escapeHtml(p.link)}">${shortenUrl(p.link)}</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function filterProjects() {
+  const query = document.getElementById("search-input").value.toLowerCase();
+  const filtered = allProjects.filter(
+    (p) =>
+      p.name.toLowerCase().includes(query) ||
+      (p.description || "").toLowerCase().includes(query)
+  );
+
+  const grid = document.getElementById("projects-grid");
+  const empty = document.getElementById("projects-empty");
+
+  if (filtered.length === 0) {
+    hideElement(grid);
+    showElement(empty);
+    document.querySelector(".empty-state h3").textContent = "No matching projects";
+    document.querySelector(".empty-state p").textContent = "Try a different search term.";
+  } else {
+    showElement(grid);
+    hideElement(empty);
+    renderProjects(filtered);
+  }
+}
+
+async function handleAddProject() {
+  const name = document.getElementById("proj-name").value.trim();
+  const link = document.getElementById("proj-link").value.trim();
+  const desc = document.getElementById("proj-desc").value.trim();
+
+  const successBanner = document.getElementById("add-success");
+  const errorBanner = document.getElementById("add-error");
+  const errorText = document.getElementById("add-error-text");
+  const btn = document.getElementById("add-btn");
+
+  hideElement(successBanner);
+  hideElement(errorBanner);
+
+  if (!name) {
+    errorText.textContent = "Project name is required.";
+    showElement(errorBanner);
+    return;
+  }
+  if (!link) {
+    errorText.textContent = "Project link is required.";
+    showElement(errorBanner);
+    return;
+  }
+  if (!isValidUrl(link)) {
+    errorText.textContent = "Please enter a valid URL (include https://).";
+    showElement(errorBanner);
+    return;
+  }
+
+  setLoading(btn, true);
+
+  try {
+    const res = await apiCall({
+      action: "addProject",
+      name,
+      link,
+      description: desc,
+    });
+
+    if (res.success) {
+      showElement(successBanner);
+      clearAddForm();
+      // Refresh project list in background
+      loadProjects();
+      // Scroll success into view
+      successBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } else {
+      errorText.textContent = res.message || "Failed to add project.";
+      showElement(errorBanner);
+    }
+  } catch (err) {
+    errorText.textContent = "Connection error. Please try again.";
+    showElement(errorBanner);
+    console.error("Add project error:", err);
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+function clearAddForm() {
+  const ids = ["proj-name", "proj-link", "proj-desc"];
+  ids.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+}
+
+// ─────────────────────────────────────────────
+//  VIEW SWITCHING
+// ─────────────────────────────────────────────
+function showView(viewId, navEl) {
+  document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach((n) => n.classList.remove("active"));
+
+  const view = document.getElementById("view-" + viewId);
+  if (view) view.classList.add("active");
+  if (navEl) navEl.classList.add("active");
+
+  // Close mobile sidebar
+  closeSidebar();
+
+  return false;
+}
+
+// ─────────────────────────────────────────────
+//  MOBILE SIDEBAR
+// ─────────────────────────────────────────────
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebar-overlay");
+  if (!sidebar) return;
+  const isOpen = sidebar.classList.toggle("open");
+  overlay.classList.toggle("visible", isOpen);
+}
+
+function closeSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebar-overlay");
+  if (sidebar) sidebar.classList.remove("open");
+  if (overlay) overlay.classList.remove("visible");
+}
+
+// ─────────────────────────────────────────────
+//  LOGOUT
+// ─────────────────────────────────────────────
+function handleLogout() {
+  clearSession();
+  window.location.href = "index.html";
+}
+
+// ─────────────────────────────────────────────
+//  API COMMUNICATION
+// ─────────────────────────────────────────────
+async function apiCall(payload) {
+  const response = await fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain" }, // Apps Script CORS workaround
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+// ─────────────────────────────────────────────
+//  UTILITY HELPERS
+// ─────────────────────────────────────────────
+function showElement(el) {
+  if (el) el.classList.remove("hidden");
+}
+
+function hideElement(el) {
+  if (el) el.classList.add("hidden");
+}
+
+function setLoading(btn, isLoading) {
+  if (!btn) return;
+  const text = btn.querySelector(".btn-text");
+  const loader = btn.querySelector(".btn-loader");
+  btn.disabled = isLoading;
+  if (text) text.classList.toggle("hidden", isLoading);
+  if (loader) loader.classList.toggle("hidden", !isLoading);
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function isValidUrl(str) {
+  try {
+    const u = new URL(str);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function shortenUrl(url) {
+  try {
+    const u = new URL(url);
+    return u.hostname + (u.pathname !== "/" ? "/…" : "");
+  } catch {
+    return url;
+  }
+}
+
+function showError(msg) {
+  console.error(msg);
+  // Could also show a toast notification here
+}

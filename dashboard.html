@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VEND MPCS – Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dashboard-page">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon small">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="10" fill="url(#grad2)"/>
+          <path d="M10 20L18 12L26 20L18 28L10 20Z" fill="white" opacity="0.9"/>
+          <path d="M18 12L30 20L18 28" stroke="white" stroke-width="2" stroke-linejoin="round" fill="none" opacity="0.5"/>
+          <defs>
+            <linearGradient id="grad2" x1="0" y1="0" x2="40" y2="40">
+              <stop offset="0%" stop-color="#1a56db"/>
+              <stop offset="100%" stop-color="#0e3faa"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Vali East</span>
+        <span class="brand-sub">MPCS LTD</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-view="dashboard" onclick="showView('dashboard', this)">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-view="add-project" onclick="showView('add-project', this)">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+        <span>Add Project</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-chip" id="user-chip">
+        <div class="user-avatar" id="user-avatar">U</div>
+        <div class="user-info">
+          <span class="user-name" id="user-name-sidebar">User</span>
+          <span class="user-role">Administrator</span>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="handleLogout()" title="Logout">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Mobile top bar -->
+  <div class="mobile-topbar">
+    <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </button>
+    <span class="mobile-title">Vali East MPCS</span>
+    <button class="btn-logout-mobile" onclick="handleLogout()">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+    </button>
+  </div>
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Dashboard View -->
+    <div class="view active" id="view-dashboard">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Projects</h1>
+          <p class="page-subtitle">Manage and access all your HTML projects</p>
+        </div>
+        <button class="btn-primary" onclick="showView('add-project', document.querySelector('[data-view=add-project]'))">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+          Add Project
+        </button>
+      </div>
+
+      <div class="stats-row" id="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon blue"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm14 1a1 1 0 11-2 0 1 1 0 012 0zM2 13a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2zm14 1a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd"/></svg></div>
+          <div>
+            <p class="stat-label">Total Projects</p>
+            <p class="stat-value" id="total-projects">—</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg></div>
+          <div>
+            <p class="stat-label">Active</p>
+            <p class="stat-value" id="active-projects">—</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg></div>
+          <div>
+            <p class="stat-label">Company</p>
+            <p class="stat-value" style="font-size:1rem">Northern Division</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="search-bar-wrap">
+        <div class="search-bar">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+          <input type="text" id="search-input" placeholder="Search projects..." oninput="filterProjects()" />
+        </div>
+      </div>
+
+      <div id="projects-loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading projects…</p>
+      </div>
+
+      <div id="projects-empty" class="empty-state hidden">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="16" width="48" height="36" rx="4" stroke="currentColor" stroke-width="2" fill="none"/>
+          <path d="M22 32h20M22 38h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M32 16V8M26 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <h3>No projects yet</h3>
+        <p>Add your first project to get started.</p>
+        <button class="btn-primary" onclick="showView('add-project', document.querySelector('[data-view=add-project]'))">Add Project</button>
+      </div>
+
+      <div id="projects-grid" class="projects-grid hidden"></div>
+    </div>
+
+    <!-- Add Project View -->
+    <div class="view" id="view-add-project">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Add Project</h1>
+          <p class="page-subtitle">Add a new HTML project to your dashboard</p>
+        </div>
+        <button class="btn-secondary" onclick="showView('dashboard', document.querySelector('[data-view=dashboard]'))">
+          ← Back to Dashboard
+        </button>
+      </div>
+
+      <div class="form-card">
+        <div id="add-success" class="success-banner hidden">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          <span>Project added successfully!</span>
+        </div>
+        <div id="add-error" class="error-banner hidden">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+          <span id="add-error-text">Failed to add project.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="proj-name">Project Name <span class="required">*</span></label>
+          <input type="text" id="proj-name" placeholder="e.g. Company Landing Page" />
+        </div>
+
+        <div class="form-group">
+          <label for="proj-link">Project Link <span class="required">*</span></label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd"/></svg>
+            <input type="url" id="proj-link" placeholder="https://yourproject.com/index.html" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="proj-desc">Description</label>
+          <textarea id="proj-desc" rows="4" placeholder="Brief description of what this project does…"></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-secondary" onclick="clearAddForm()">Clear</button>
+          <button class="btn-primary" id="add-btn" onclick="handleAddProject()">
+            <span class="btn-text">Add Project</span>
+            <span class="btn-loader hidden">
+              <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4" stroke-dashoffset="10"/></svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
