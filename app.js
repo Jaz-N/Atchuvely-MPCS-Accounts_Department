@@ -8,7 +8,7 @@
 // ─────────────────────────────────────────────
 //  CONFIGURATION — EDIT THIS
 // ─────────────────────────────────────────────
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxawqgBZRS8JeMqKAkoeRJr1IMdk2JgePEIew2AcM7AFQM84aUwaLC99dGbBQmIV_XfHA/exec";
+const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
 
 // Session key names
 const SESSION_USER_KEY = "mpcs_user";
@@ -24,7 +24,7 @@ const isDashboardPage = document.body.classList.contains("dashboard-page");
 //  SESSION HELPERS
 // ─────────────────────────────────────────────
 function setSession(username) {
-  const token = btoa(username + ":" + Date.now()); // simple client token
+  const token = btoa(username + ":" + Date.now());
   sessionStorage.setItem(SESSION_USER_KEY, username);
   sessionStorage.setItem(SESSION_TOKEN_KEY, token);
 }
@@ -61,7 +61,6 @@ if (isDashboardPage && !isLoggedIn()) {
 //  LOGIN PAGE LOGIC
 // ─────────────────────────────────────────────
 if (isLoginPage) {
-  // Allow Enter key to submit
   document.addEventListener("keydown", (e) => {
     if (e.key === "Enter") handleLogin();
   });
@@ -85,11 +84,7 @@ async function handleLogin() {
   setLoading(btn, true);
 
   try {
-    const res = await apiCall({
-      action: "login",
-      username,
-      password,
-    });
+    const res = await apiCall({ action: "login", username, password });
 
     if (res.success) {
       setSession(username);
@@ -118,14 +113,12 @@ function togglePassword() {
 let allProjects = [];
 
 if (isDashboardPage) {
-  // Set user info in sidebar
   const { username } = getSession();
   const nameEl = document.getElementById("user-name-sidebar");
   const avatarEl = document.getElementById("user-avatar");
   if (nameEl) nameEl.textContent = username || "User";
   if (avatarEl) avatarEl.textContent = (username || "U").charAt(0).toUpperCase();
 
-  // Load projects on start
   loadProjects();
 }
 
@@ -176,7 +169,7 @@ function renderProjects(projects) {
     card.innerHTML = `
       <div class="project-card-top"></div>
       <div class="project-card-body">
-        <span class="project-index">Project #${String(i + 1).padStart(2, "0")}</span>
+        <span class="project-index">Accounts Department Project ${String(i + 1).padStart(2, "0")}</span>
         <h3 class="project-name">${escapeHtml(p.name)}</h3>
         <p class="project-desc">${escapeHtml(p.description) || "No description provided."}</p>
       </div>
@@ -185,7 +178,6 @@ function renderProjects(projects) {
           <svg viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
           Open
         </a>
-        <span class="project-link-chip" title="${escapeHtml(p.link)}">${shortenUrl(p.link)}</span>
       </div>
     `;
     grid.appendChild(card);
@@ -206,8 +198,10 @@ function filterProjects() {
   if (filtered.length === 0) {
     hideElement(grid);
     showElement(empty);
-    document.querySelector(".empty-state h3").textContent = "No matching projects";
-    document.querySelector(".empty-state p").textContent = "Try a different search term.";
+    const h3 = document.querySelector(".empty-state h3");
+    const pg = document.querySelector(".empty-state p");
+    if (h3) h3.textContent = "No matching projects";
+    if (pg) pg.textContent = "Try a different search term.";
   } else {
     showElement(grid);
     hideElement(empty);
@@ -215,6 +209,9 @@ function filterProjects() {
   }
 }
 
+// ─────────────────────────────────────────────
+//  ADD PROJECT (now in Settings)
+// ─────────────────────────────────────────────
 async function handleAddProject() {
   const name = document.getElementById("proj-name").value.trim();
   const link = document.getElementById("proj-link").value.trim();
@@ -247,19 +244,12 @@ async function handleAddProject() {
   setLoading(btn, true);
 
   try {
-    const res = await apiCall({
-      action: "addProject",
-      name,
-      link,
-      description: desc,
-    });
+    const res = await apiCall({ action: "addProject", name, link, description: desc });
 
     if (res.success) {
       showElement(successBanner);
       clearAddForm();
-      // Refresh project list in background
       loadProjects();
-      // Scroll success into view
       successBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } else {
       errorText.textContent = res.message || "Failed to add project.";
@@ -275,8 +265,75 @@ async function handleAddProject() {
 }
 
 function clearAddForm() {
-  const ids = ["proj-name", "proj-link", "proj-desc"];
-  ids.forEach((id) => {
+  ["proj-name", "proj-link", "proj-desc"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+}
+
+// ─────────────────────────────────────────────
+//  CHANGE PASSWORD
+// ─────────────────────────────────────────────
+async function handleChangePassword() {
+  const current = document.getElementById("pwd-current").value;
+  const newPwd = document.getElementById("pwd-new").value;
+  const confirm = document.getElementById("pwd-confirm").value;
+
+  const successBanner = document.getElementById("pwd-success");
+  const errorBanner = document.getElementById("pwd-error");
+  const errorText = document.getElementById("pwd-error-text");
+  const btn = document.getElementById("pwd-btn");
+
+  hideElement(successBanner);
+  hideElement(errorBanner);
+
+  if (!current || !newPwd || !confirm) {
+    errorText.textContent = "All password fields are required.";
+    showElement(errorBanner);
+    return;
+  }
+  if (newPwd !== confirm) {
+    errorText.textContent = "New passwords do not match.";
+    showElement(errorBanner);
+    return;
+  }
+  if (newPwd.length < 6) {
+    errorText.textContent = "New password must be at least 6 characters.";
+    showElement(errorBanner);
+    return;
+  }
+
+  setLoading(btn, true);
+
+  const { username } = getSession();
+
+  try {
+    const res = await apiCall({
+      action: "changePassword",
+      username,
+      currentPassword: current,
+      newPassword: newPwd,
+    });
+
+    if (res.success) {
+      showElement(successBanner);
+      clearPasswordForm();
+      successBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } else {
+      errorText.textContent = res.message || "Failed to update password.";
+      showElement(errorBanner);
+    }
+  } catch (err) {
+    errorText.textContent = "Connection error. Please try again.";
+    showElement(errorBanner);
+    console.error("Change password error:", err);
+  } finally {
+    setLoading(btn, false);
+  }
+}
+
+function clearPasswordForm() {
+  ["pwd-current", "pwd-new", "pwd-confirm"].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.value = "";
   });
@@ -293,9 +350,7 @@ function showView(viewId, navEl) {
   if (view) view.classList.add("active");
   if (navEl) navEl.classList.add("active");
 
-  // Close mobile sidebar
   closeSidebar();
-
   return false;
 }
 
@@ -331,7 +386,7 @@ function handleLogout() {
 async function apiCall(payload) {
   const response = await fetch(APPS_SCRIPT_URL, {
     method: "POST",
-    headers: { "Content-Type": "text/plain" }, // Apps Script CORS workaround
+    headers: { "Content-Type": "text/plain" },
     body: JSON.stringify(payload),
   });
 
@@ -339,8 +394,7 @@ async function apiCall(payload) {
     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
 
-  const data = await response.json();
-  return data;
+  return await response.json();
 }
 
 // ─────────────────────────────────────────────
@@ -382,16 +436,6 @@ function isValidUrl(str) {
   }
 }
 
-function shortenUrl(url) {
-  try {
-    const u = new URL(url);
-    return u.hostname + (u.pathname !== "/" ? "/…" : "");
-  } catch {
-    return url;
-  }
-}
-
 function showError(msg) {
   console.error(msg);
-  // Could also show a toast notification here
 }
