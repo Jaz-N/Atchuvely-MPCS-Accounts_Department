@@ -70,7 +70,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--slate-900);
+  background: var(--slate-50);  /* ✅ LIGHT */
+}
   position: relative;
   overflow: hidden;
 }
@@ -116,9 +117,9 @@ body {
 }
 
 .login-card {
-  background: rgba(10, 22, 40, 0.88);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(26, 111, 232, 0.18);
+  background: white;
+  border: 1px solid var(--slate-200);
+  color: var(--slate-800);
   border-radius: 20px;
   padding: 40px;
   box-shadow: var(--shadow-lg), 0 0 0 1px rgba(26,111,232,0.08);
