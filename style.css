@@ -70,8 +70,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--slate-50);  /* ✅ LIGHT */
-}
+  background: var(--slate-50);
   position: relative;
   overflow: hidden;
 }
@@ -154,7 +153,7 @@ body {
   font-family: var(--font-display);
   font-size: 1.3rem;
   font-weight: 800;
-  color: white;
+  color: var(--slate-900);
   line-height: 1.2;
 }
 .login-brand .brand-text p {
@@ -171,7 +170,6 @@ body {
 }
 
 .login-title {
-   .login-brand .brand-text h1 {
   color: var(--slate-900);
   font-size: 1.6rem;
   font-weight: 700;
@@ -192,13 +190,12 @@ body {
   display: block;
   font-size: 0.82rem;
   font-weight: 500;
-  color: var(--slate-300);
-  margin-bottom: 7px;
+  color: var(--slate-600);
   letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 
-.login-card .form-group label { color: var(--slate-300); }
+.login-card .form-group label { color: var(--slate-600); }
 
 .input-wrap {
   position: relative;
@@ -218,7 +215,6 @@ input[type="text"],
 input[type="password"],
 input[type="url"],
 textarea {
-  border: 1.5px solid rgba(255,255,255,0.1);
   background: white;
   color: var(--slate-800);
   border: 1.5px solid var(--slate-200);
@@ -372,16 +368,16 @@ input:focus, textarea:focus {
 }
 
 .error-banner {
-  background: rgba(220, 38, 38, 0.12);
+  background: var(--red-100);
   border: 1px solid rgba(220, 38, 38, 0.25);
-  color: #fca5a5;
+  color: var(--red-600);
 }
 .error-banner svg { width: 18px; height: 18px; flex-shrink: 0; }
 
 .success-banner {
-  background: rgba(34, 197, 94, 0.12);
+  background: var(--green-100);
   border: 1px solid rgba(34, 197, 94, 0.25);
-  color: #86efac;
+  color: var(--green-700);
 }
 .success-banner svg { width: 18px; height: 18px; flex-shrink: 0; }
 
@@ -411,15 +407,15 @@ input:focus, textarea:focus {
 /* Sidebar */
 .sidebar {
   width: var(--sidebar-width);
-  background: var(--slate-900);
+  background: white;
   display: flex;
   flex-direction: column;
   position: fixed;
   top: 0; left: 0; bottom: 0;
   z-index: 100;
   transition: transform 0.3s ease;
-  box-shadow: 4px 0 24px rgba(0,0,0,0.18);
-  border-right: 1px solid rgba(26,111,232,0.12);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.06);
+  border-right: 1px solid var(--slate-200);
 }
 
 .sidebar-brand {
@@ -427,7 +423,7 @@ input:focus, textarea:focus {
   align-items: center;
   gap: 12px;
   padding: 20px;
-  border-bottom: 1px solid rgba(26,111,232,0.1);
+  border-bottom: 1px solid var(--slate-200);
 }
 
 .sidebar-brand .brand-text {
@@ -438,7 +434,7 @@ input:focus, textarea:focus {
   font-family: var(--font-display);
   font-size: 1.05rem;
   font-weight: 700;
-  color: white;
+  color: var(--slate-900);
   line-height: 1.2;
 }
 .brand-sub {
@@ -462,19 +458,19 @@ input:focus, textarea:focus {
   gap: 10px;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
-  color: var(--slate-400);
+  color: var(--slate-600);
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 500;
   transition: background 0.15s, color 0.15s;
 }
 .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
-.nav-item:hover { background: rgba(255,255,255,0.06); color: var(--slate-200); }
-.nav-item.active { background: rgba(26, 111, 232, 0.2); color: #7ab3f7; }
+.nav-item:hover { background: var(--corp-50); color: var(--corp-700); }
+.nav-item.active { background: var(--corp-50); color: var(--corp-600); font-weight: 600; }
 
 .sidebar-footer {
   padding: 16px 12px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid var(--slate-200);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -511,7 +507,7 @@ input:focus, textarea:focus {
 .user-name {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--slate-200);
+  color: var(--slate-800);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -543,18 +539,18 @@ input:focus, textarea:focus {
   position: fixed;
   top: 0; left: 0; right: 0;
   height: var(--topbar-height);
-  background: var(--slate-900);
+  background: white;
   z-index: 90;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  border-bottom: 1px solid rgba(26,111,232,0.12);
+  border-bottom: 1px solid var(--slate-200);
 }
 .mobile-title {
   font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 700;
-  color: white;
+  color: var(--slate-900);
 }
 .hamburger {
   background: none; border: none; cursor: pointer;
@@ -562,7 +558,7 @@ input:focus, textarea:focus {
 }
 .hamburger span {
   display: block; width: 22px; height: 2px;
-  background: var(--slate-300); border-radius: 2px;
+  background: var(--slate-600); border-radius: 2px;
   transition: 0.2s;
 }
 .btn-logout-mobile {
