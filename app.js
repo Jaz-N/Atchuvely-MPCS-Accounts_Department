@@ -1,6 +1,6 @@
 /**
  * VALI EAST NORTHERN DIVISION MPCS LTD
- * Project Dashboard — Frontend Logic
+ * Management Dashboard — Frontend Logic
  *
  * Replace APPS_SCRIPT_URL with your deployed Google Apps Script Web App URL.
  */
@@ -149,10 +149,10 @@ async function loadProjects() {
         showElement(grid);
       }
     } else {
-      showError("Failed to load projects: " + (res.message || "Unknown error"));
+      showError("Failed to load data: " + (res.message || "Unknown error"));
     }
   } catch (err) {
-    console.error("Load projects error:", err);
+    console.error("Load error:", err);
     showError("Could not connect to the backend. Verify your Apps Script URL.");
   } finally {
     hideElement(loading);
@@ -169,14 +169,14 @@ function renderProjects(projects) {
     card.innerHTML = `
       <div class="project-card-top"></div>
       <div class="project-card-body">
-        <span class="project-index">Accounts Department Project ${String(i + 1).padStart(2, "0")}</span>
+        <span class="project-index">${String(i + 1).padStart(2, "0")}</span>
         <h3 class="project-name">${escapeHtml(p.name)}</h3>
         <p class="project-desc">${escapeHtml(p.description) || "No description provided."}</p>
       </div>
       <div class="project-card-footer">
         <a href="${escapeHtml(p.link)}" target="_blank" rel="noopener noreferrer" class="btn-open">
           <svg viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
-          Open
+          Access
         </a>
       </div>
     `;
@@ -200,7 +200,7 @@ function filterProjects() {
     showElement(empty);
     const h3 = document.querySelector(".empty-state h3");
     const pg = document.querySelector(".empty-state p");
-    if (h3) h3.textContent = "No matching projects";
+    if (h3) h3.textContent = "No matching modules";
     if (pg) pg.textContent = "Try a different search term.";
   } else {
     showElement(grid);
@@ -210,7 +210,7 @@ function filterProjects() {
 }
 
 // ─────────────────────────────────────────────
-//  ADD PROJECT (now in Settings)
+//  REGISTER MODULE (in Settings)
 // ─────────────────────────────────────────────
 async function handleAddProject() {
   const name = document.getElementById("proj-name").value.trim();
@@ -226,12 +226,12 @@ async function handleAddProject() {
   hideElement(errorBanner);
 
   if (!name) {
-    errorText.textContent = "Project name is required.";
+    errorText.textContent = "Module name is required.";
     showElement(errorBanner);
     return;
   }
   if (!link) {
-    errorText.textContent = "Project link is required.";
+    errorText.textContent = "Access link is required.";
     showElement(errorBanner);
     return;
   }
@@ -252,13 +252,13 @@ async function handleAddProject() {
       loadProjects();
       successBanner.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } else {
-      errorText.textContent = res.message || "Failed to add project.";
+      errorText.textContent = res.message || "Failed to register module.";
       showElement(errorBanner);
     }
   } catch (err) {
     errorText.textContent = "Connection error. Please try again.";
     showElement(errorBanner);
-    console.error("Add project error:", err);
+    console.error("Register error:", err);
   } finally {
     setLoading(btn, false);
   }
